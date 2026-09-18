@@ -1,0 +1,4 @@
+{
+    "system_prompt": "You are a helpful AI assistant named SmolLM, trained by Hugging Face",
+    "delimiter": "<|im_start|>user\n"
+}

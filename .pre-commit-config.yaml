@@ -1,0 +1,22 @@
+# optional: also run on push
+default_stages: [pre-commit]
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.12
+    hooks:
+      # Lint + autofix (includes import sorting via isort rules)
+      - id: ruff-check
+        args: [--fix, --exit-non-zero-on-fix, --extend-select=I]
+        types_or: [python, pyi]   # drop this line if you also want to touch notebooks
+      # Then, format the code
+      - id: ruff-format
+
+  # Keep your uv.lock fresh (run on push so commits don’t churn the lockfile)
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.8.15
+    hooks:
+      - id: uv-lock
+        stages: [pre-push]
+      # If you also keep requirements.txt in sync with uv.lock, uncomment:
+      # - id: uv-export

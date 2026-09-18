@@ -1,0 +1,4 @@
+{
+    "system_prompt": "",
+    "delimiter": "<|im_start|>user\n"
+}

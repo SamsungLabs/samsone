@@ -1,0 +1,69 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "samsone"
+version = "0.1.0"
+description = "Samsone"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "accelerate>=1.11.0",
+    "clearml>=2.0.2",
+    "einops>=0.8.1",
+    "executorch==1.0.1",
+    "filelock>=3.12.0",
+    "hf-transfer>=0.1.9",
+    "huggingface-hub>=0.34.4",
+    "jsonargparse[omegaconf,signatures]>4.28.0",
+    "lightning>=2.5.4",
+    "nltk>=3.9.2",
+    "omegaconf>=2.3.0",
+    "pip==25.2",
+    "pycocoevalcap>=1.2",
+    "requests>=2.31.0",
+    "scikit-learn>=1.7.1",
+    "setproctitle>=1.3.6",
+    "tensorboard>=2.20.0",
+    "tlparse>=0.4.3",
+    "torch==2.9.1",
+    "torchaudio>=2.9.0",
+    "torchcodec>=0.9.0",
+    "transformers>=4.56.1",
+    "torchtune>=0.6.1",
+    "aac-metrics>=0.5.4",
+]
+
+[project.scripts]
+samsone99M = "samsone.inference.cli:main_99m"
+samsone134M = "samsone.inference.cli:main_134m"
+samsone356M = "samsone.inference.cli:main_356m"
+
+[tool.uv]
+override-dependencies = [
+    "hf-xet; python_version < '3.0'",  # avoid installing hf-xet
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[dependency-groups]
+dev = [
+    "datasets>=4.2.0",
+    "ipykernel>=6.30.1",
+    "librosa>=0.11.0",
+    "numba>=0.55.0",
+    "polars",
+    "pre-commit>=4.3.0",
+    "pre-commit-uv>=4.1.5",
+    "sentence-transformers>=5.1.2",
+]
+
+[tool.ruff.lint]
+extend-select = ["I"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["samsone"]
+combine-as-imports = true
+force-sort-within-sections = true

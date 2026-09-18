@@ -1,0 +1,46 @@
+defaults:
+  - backend: xnnpack
+
+# Global settings
+output_root: "./outputs/export/134M"
+export_dir: "${output_root}/exported"
+text_model_dir: "${output_root}/text_model"
+dtype: "fp32"
+
+# Audio model export configuration
+audio_export:
+  config_path: "configs/Whisper/SALM_Export_134M.yaml"
+  output_file: "${export_dir}/Samsone134M_audio_model.pte"
+  audio_features_shape: [2, 80, 3000]
+  post_audio_tokens_shape: [1, 100]
+  backend: "${backend}"
+
+# Text model configuration (for export_llm) - will be extracted to separate file
+export_llm_config_path: "./scripts/export/export_llm_config.yaml"
+export_llm_config:
+  base:
+    model_class: smollm2
+    checkpoint: "${text_model_dir}/converted.pt"
+    params: "./scripts/export/smollm2_config.json"
+    metadata: '{"get_bos_id":0, "get_eos_ids":[0]}'
+  export:
+    output_name: "${export_dir}/Samsone134M_text_model.pte"
+    max_seq_length: 501
+    max_context_length: 501
+  model:
+    use_kv_cache: true 
+    use_sdpa_with_kv_cache: true
+    dtype_override: "${dtype}"
+  backend: "${backend}"
+
+# Audio processor configuration
+audio_processor:
+  output_file: "${export_dir}/audio_processor.pte"
+  backend: "${backend}"
+  feature_size: 80
+  sampling_rate: 16000
+  hop_length: 160
+  chunk_length: 30
+  n_fft: 400
+  stack_output: false
+

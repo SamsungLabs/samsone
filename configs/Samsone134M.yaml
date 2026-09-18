@@ -1,0 +1,253 @@
+# lightning.pytorch==2.6.0
+seed_everything: 1234
+trainer:
+  accelerator: gpu
+  strategy: auto
+  devices: auto
+  num_nodes: 1
+  precision: bf16-mixed
+  logger:
+    class_path: lightning.pytorch.loggers.TensorBoardLogger
+    init_args:
+      save_dir: outputs/Samsone134M
+      name: null
+      version: ''
+      log_graph: false
+      default_hp_metric: true
+      prefix: ''
+      sub_dir: null
+      comment: ''
+      purge_step: null
+      max_queue: 10
+      flush_secs: 120
+      filename_suffix: ''
+  callbacks:
+  - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+    init_args:
+      logging_interval: step
+      log_momentum: false
+      log_weight_decay: false
+  - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+    init_args:
+      dirpath: null
+      filename: '{epoch}_{step}'
+      monitor: null
+      verbose: false
+      save_last: true
+      save_top_k: -1
+      save_on_exception: false
+      save_weights_only: false
+      mode: min
+      auto_insert_metric_name: true
+      every_n_train_steps: null
+      train_time_interval: null
+      every_n_epochs: 5
+      save_on_train_epoch_end: true
+      enable_version_counter: false
+  - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+    init_args:
+      dirpath: null
+      filename: val_best_{epoch}_{step}
+      monitor: val_loss
+      verbose: false
+      save_last: null
+      save_top_k: 1
+      save_on_exception: false
+      save_weights_only: false
+      mode: min
+      auto_insert_metric_name: true
+      every_n_train_steps: null
+      train_time_interval: null
+      every_n_epochs: null
+      save_on_train_epoch_end: true
+      enable_version_counter: false
+  fast_dev_run: false
+  max_epochs: 100
+  min_epochs: null
+  max_steps: -1
+  min_steps: null
+  max_time: null
+  limit_train_batches: null
+  limit_val_batches: null
+  limit_test_batches: null
+  limit_predict_batches: null
+  overfit_batches: 0.0
+  val_check_interval: null
+  check_val_every_n_epoch: 1
+  num_sanity_val_steps: null
+  log_every_n_steps: null
+  enable_checkpointing: null
+  enable_progress_bar: null
+  enable_model_summary: null
+  accumulate_grad_batches: 1
+  gradient_clip_val: null
+  gradient_clip_algorithm: null
+  deterministic: null
+  benchmark: null
+  inference_mode: true
+  use_distributed_sampler: true
+  profiler: null
+  detect_anomaly: false
+  barebones: false
+  plugins: null
+  sync_batchnorm: false
+  reload_dataloaders_every_n_epochs: 0
+  default_root_dir: null
+  enable_autolog_hparams: true
+  model_registry: null
+model:
+  class_path: samsone.experiments.AudioLMExperiment
+  init_args:
+    audio_lm_model:
+      class_path: samsone.models.multimodal.AudioLM
+      init_args:
+        audio_encoder:
+          class_path: samsone.models.audio.AudioEncoderWithPooling
+          init_args:
+            encoder:
+              class_path: samsone.models.audio.WhisperAudioEncoder
+              init_args:
+                model_name_or_path: openai/whisper-tiny
+            pooler:
+              class_path: samsone.models.audio.HuggingFaceAudioEmbeddingsPooler
+              init_args:
+                model_name_or_path: openai/whisper-tiny
+        projector:
+          class_path: samsone.models.projectors.NonLinearProjector
+          init_args:
+            input_embedding_dim: 384
+            output_embedding_dim: 576
+            dropout_p: 0.5
+        text_model:
+          class_path: samsone.models.text.lm.HuggingFaceLM
+          init_args:
+            model_name_or_path: HuggingFaceTB/SmolLM2-135M
+            generation_config:
+              do_sample: false
+              temperature: 0.0
+              top_p: 1.0
+            num_hidden_layers: null
+            prune_tokens_map_path: outputs/prune_map.json
+    freeze_config:
+      freeze_modules:
+      - text_model.model.model.embed_tokens
+    summary_config:
+      print_summary: true
+      freeze_summary_depth: 1
+    max_train_seq_tokens: 500
+    max_new_tokens: 100
+    logging_config:
+      sample_rate: 16000
+      log_generate_train_step: 1000
+      log_generate_val_step: 150
+      log_generate_test_step: 500
+    optimizer:
+      class_path: torch.optim.AdamW
+      init_args:
+        lr: 0.0003
+        betas:
+        - 0.9
+        - 0.999
+        eps: 1.0e-08
+        weight_decay: 0.01
+        amsgrad: false
+        maximize: false
+        foreach: null
+        capturable: false
+        differentiable: false
+        fused: null
+    lr_scheduler:
+      class_path: samsone.training.schedulers.CosineAnnealingWarmupLR
+      init_args:
+        warmup_steps: 10
+        max_steps: 100
+        min_lr: 1.0e-07
+        last_epoch: -1
+    model_ckpt_load_path: null
+    force_generate_test: false
+data:
+  class_path: samsone.data.datamodules.audio_text_datamodules.AudioQATextDatamodule
+  init_args:
+    train_cfg:
+      audio_cfg:
+        data_dir: /path/to/data/root
+        wav_processor:
+          class_path: samsone.data.preprocessing.composition.Compose
+          init_args:
+            transforms:
+            - class_path: samsone.data.preprocessing.audio.ToMono
+            - class_path: samsone.data.preprocessing.audio.CropOrPad
+              init_args:
+                segment_length: 480000
+            shuffle: false
+        feature_extractor:
+          class_path: samsone.data.preprocessing.audio.WhisperFeatureExtractor
+          init_args:
+            model_name_or_path: openai/whisper-tiny
+            sample_rate: 16000
+        sample_rate: 16000
+      text_cfg:
+        tokenizer_hf_path: HuggingFaceTB/SmolLM2-135M
+        prompt_template_filepath: src/samsone/data/datasets/prompt_templates/HuggingFaceTB/SmolLM2-135M.json
+        text_preprocessor:
+          class_path: samsone.data.preprocessing.text.TextPreprocessorPipeline
+          init_args:
+            preprocessors:
+            - class_path: samsone.data.preprocessing.text.ToLowerCase
+            - class_path: samsone.data.preprocessing.text.RemoveExcessiveWhitespace
+            - class_path: samsone.data.preprocessing.text.RemoveNonLatin
+            - class_path: samsone.data.preprocessing.text.RemoveRepeatedSpecialChars
+        response_prefix: ' answer: '
+        prune_tokens_map_path: outputs/prune_map.json
+      meta_paths:
+      - /path/to/training/meta.parquet
+      batch_size: 90
+      num_workers: 8
+      samples_per_epoch: 200000
+      dataset_weights: null
+    valid_cfg:
+      audio_cfg:
+        data_dir: /path/to/data/root
+        wav_processor:
+          class_path: samsone.data.preprocessing.composition.Compose
+          init_args:
+            transforms:
+            - class_path: samsone.data.preprocessing.audio.ToMono
+            - class_path: samsone.data.preprocessing.audio.CropOrPad
+              init_args:
+                segment_length: 480000
+            shuffle: false
+        feature_extractor:
+          class_path: samsone.data.preprocessing.audio.WhisperFeatureExtractor
+          init_args:
+            model_name_or_path: openai/whisper-tiny
+            sample_rate: 16000
+        sample_rate: 16000
+      text_cfg:
+        tokenizer_hf_path: HuggingFaceTB/SmolLM2-135M
+        prompt_template_filepath: src/samsone/data/datasets/prompt_templates/HuggingFaceTB/SmolLM2-135M.json
+        text_preprocessor:
+          class_path: samsone.data.preprocessing.text.TextPreprocessorPipeline
+          init_args:
+            preprocessors:
+            - class_path: samsone.data.preprocessing.text.ToLowerCase
+            - class_path: samsone.data.preprocessing.text.RemoveExcessiveWhitespace
+            - class_path: samsone.data.preprocessing.text.RemoveNonLatin
+            - class_path: samsone.data.preprocessing.text.RemoveRepeatedSpecialChars
+        response_prefix: ' answer: '
+        prune_tokens_map_path: outputs/prune_map.json
+      meta_paths:
+      - /path/to/valid/meta.parquet
+      batch_size: 16
+      num_workers: 8
+      samples_per_epoch: 10000
+      dataset_weights: null
+    test_cfgs: null
+current_time: 2026-02-19_14-23-06-773419
+experiment_name: Samsone134M
+hf_text_model_name: HuggingFaceTB/SmolLM2-135M
+hf_audio_model_name: openai/whisper-tiny
+sample_rate: 16000
+experiment_state_load_path: null
+optimizer: null
+lr_scheduler: null
