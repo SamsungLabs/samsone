@@ -4,8 +4,15 @@
   </a>
 </p>
 
-**Samsone: A Family of Open Small Audio Language Models for On-Device Inference**
+<center>
+
+  [Full Paper](https://github.com/SamsungLabs/samsone.git)
+
+</center>
+
+Official repo for _**Samsone: A Family of Open Small Audio Language Models for On-Device Inference**_
 *Accepted at Interspeech 2026.*
+
 
 <p align="center">
   <a href="assets/model_performance.pdf">
