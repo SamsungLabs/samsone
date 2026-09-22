@@ -7,7 +7,7 @@
 
 
 <p align="center">
-  <a href="https://github.com/SamsungLabs/samsone.git">Full Paper</a>
+  <a href="https://arxiv.org/abs/2609.21666">Full Paper</a>
 </p>
 
 Official repo for _**Samsone: A Family of Open Small Audio Language Models for On-Device Inference**_
