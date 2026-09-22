@@ -2,13 +2,13 @@
   <a>
     <img src="assets/samsone_logo.png" alt="samsone logo" width="400">
   </a>
-</p>
 
-<center>
 
-  [Full Paper](https://github.com/SamsungLabs/samsone.git)
-
-</center>
+<div style="text-align:center">    
+  <a href="https://github.com/SamsungLabs/samsone.git">Full Paper</a>
+  
+  <!-- more links here -->
+</div>
 
 Official repo for _**Samsone: A Family of Open Small Audio Language Models for On-Device Inference**_
 *Accepted at Interspeech 2026.*
