@@ -16,6 +16,7 @@ import com.samsung.samsone.presentation.models.SALMConfig
 import com.samsung.samsone.presentation.viewmodel.helpers.AudioCache
 import com.samsung.samsone.presentation.viewmodel.helpers.AudioProcessingResult
 import com.samsung.samsone.presentation.viewmodel.helpers.ProcessingUtils
+import com.samsung.samsone.presentation.viewmodel.helpers.PromptUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -154,7 +155,7 @@ class MainScreenViewModel @Inject constructor(
                 }
                 
                 withContext(Dispatchers.Default) {
-                    var textTokens = tokenizer.encode(query + " answer: ")
+                    var textTokens = tokenizer.encode(PromptUtils.normalize(query) + " answer: ")
                     
                     // Apply reverse prune map if pruning is enabled
                     textTokens = ProcessingUtils.applyReversePruneMap(
