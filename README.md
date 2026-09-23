@@ -157,6 +157,13 @@ it into our parquet format. Each row should follow this structure:
 
 Adjust dataset paths and other infrastructure-specific settings before launching a run.
 
+The configs read the pruned vocabulary map from `outputs/prune_map.json`. Create it
+once from the repository root:
+
+```commandline
+uv run scripts/vocabulary/create_prune_map.py
+```
+
 Run a training job with:
 
 ```commandline
