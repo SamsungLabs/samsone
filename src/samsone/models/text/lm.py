@@ -5,11 +5,13 @@ from typing import Any
 
 import torch
 from transformers import (
+    AutoConfig,
     AutoModelForCausalLM,
     AutoTokenizer,
     PreTrainedModel,
     PreTrainedTokenizerBase,
 )
+from transformers.modeling_utils import no_init_weights
 
 from samsone.models.base import Model
 from samsone.models.text.utils import prune_input_vocab
@@ -71,11 +73,18 @@ class HuggingFaceLM(LM):
         generation_config: GenerationConfig = GenerationConfig(),
         num_hidden_layers: int | None = None,
         prune_tokens_map_path: str | None = None,
+        load_pretrained_weights: bool = True,
     ):
         super().__init__()
-        self.model: PreTrainedModel = AutoModelForCausalLM.from_pretrained(
-            model_name_or_path
-        )
+        if load_pretrained_weights:
+            self.model: PreTrainedModel = AutoModelForCausalLM.from_pretrained(
+                model_name_or_path
+            )
+        else:  # weights will come from a Samsone checkpoint
+            with no_init_weights():
+                self.model = AutoModelForCausalLM.from_config(
+                    AutoConfig.from_pretrained(model_name_or_path)
+                )
         if num_hidden_layers is not None:
             if self.model.config.num_hidden_layers < num_hidden_layers:
                 raise ValueError(
