@@ -58,13 +58,20 @@ if __name__ == "__main__":
     cli.trainer.fit(
         model=cli.model, datamodule=cli.datamodule, ckpt_path=ckpt_load_path
     )
-    cli.trainer.test(model=cli.model, datamodule=cli.datamodule)
 
-    valid_best_ckpt_path = next(
-        Path(output_dir / "checkpoints").glob("val_best*"), None
-    )
+    # the release configs have no test sets, and trainer.test() raises without them
+    if cli.datamodule.test_cfgs and cli.datamodule.evaluators:
+        cli.trainer.test(model=cli.model, datamodule=cli.datamodule)
 
-    if valid_best_ckpt_path:
-        cli.trainer.test(
-            model=cli.model, datamodule=cli.datamodule, ckpt_path=valid_best_ckpt_path
+        valid_best_ckpt_path = next(
+            Path(output_dir / "checkpoints").glob("val_best*"), None
         )
+
+        if valid_best_ckpt_path:
+            cli.trainer.test(
+                model=cli.model,
+                datamodule=cli.datamodule,
+                ckpt_path=valid_best_ckpt_path,
+            )
+    else:
+        logger.warning("No test_cfgs/evaluators in the config, skipping the test run.")
