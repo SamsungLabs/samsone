@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 
 import torch
-from transformers import AutoModel, PreTrainedModel
+from transformers import AutoConfig, AutoModel, PreTrainedModel
+from transformers.modeling_utils import no_init_weights
 
 from samsone.models.audio.poolers import AudioEmbeddingsPooler
 from samsone.models.base import Model
@@ -33,13 +34,23 @@ class HuggingFaceAudioEncoder(AudioEncoder):
     Audio encoder using HuggingFace pre-trained audio models.
     """
 
-    def __init__(self, model_name_or_path: str):
+    def __init__(self, model_name_or_path: str, load_pretrained_weights: bool = True):
         """
         Args:
             model_name_or_path (str): Name or path of the HuggingFace audio model to use.
+            load_pretrained_weights (bool): If False, only the architecture is built
+                (e.g. when a Samsone checkpoint will be loaded on top).
         """
         super().__init__()
-        self.encoder: PreTrainedModel = AutoModel.from_pretrained(model_name_or_path)
+        if load_pretrained_weights:
+            self.encoder: PreTrainedModel = AutoModel.from_pretrained(
+                model_name_or_path
+            )
+        else:
+            with no_init_weights():
+                self.encoder = AutoModel.from_config(
+                    AutoConfig.from_pretrained(model_name_or_path)
+                )
 
     def forward(self, audio_features: dict) -> tuple[torch.Tensor, torch.Tensor]:
         """
@@ -57,8 +68,8 @@ class HuggingFaceAudioEncoder(AudioEncoder):
 
 
 class WhisperAudioEncoder(HuggingFaceAudioEncoder):
-    def __init__(self, model_name_or_path: str):
-        super().__init__(model_name_or_path)
+    def __init__(self, model_name_or_path: str, load_pretrained_weights: bool = True):
+        super().__init__(model_name_or_path, load_pretrained_weights)
         self.encoder = self.encoder._modules["encoder"]
 
     def forward(self, audio_features: dict) -> tuple[torch.Tensor, torch.Tensor]:

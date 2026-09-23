@@ -122,10 +122,13 @@ class SamsoneModel:
             generation_config=GenerationConfig(),
             num_hidden_layers=self.spec.num_hidden_layers,
             prune_tokens_map_path=str(token_map_path),
+            load_pretrained_weights=False,
         )
         return AudioLM(
             audio_encoder=AudioEncoderWithPooling(
-                encoder=WhisperAudioEncoder("openai/whisper-tiny"),
+                encoder=WhisperAudioEncoder(
+                    "openai/whisper-tiny", load_pretrained_weights=False
+                ),
                 pooler=HuggingFaceAudioEmbeddingsPooler("openai/whisper-tiny"),
             ),
             projector=NonLinearProjector(
