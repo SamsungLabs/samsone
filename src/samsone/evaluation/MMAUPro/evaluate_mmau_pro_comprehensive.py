@@ -26,12 +26,7 @@ import torch.nn.functional as F
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-warnings.filterwarnings("ignore")
-
-nltk.download("punkt")
-nltk.download("wordnet")
-nltk.download("omw-1.4")
-nltk.download("punkt_tab")
+NLTK_PACKAGES = ("punkt", "wordnet", "omw-1.4", "punkt_tab")
 
 # ================================
 # Audio Instruction Following (AIF) Evaluation Functions
@@ -644,6 +639,18 @@ def calculate_weighted_performance(category_results):
 
 
 def main(df: DataFrame, model_output_column_name: str, parquet_file_path: str, use_reduced_models: bool):
+    # not at import time: the training datamodule imports this module too
+    for package in NLTK_PACKAGES:
+        nltk.download(package, quiet=True)
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        return _main(
+            df, model_output_column_name, parquet_file_path, use_reduced_models
+        )
+
+
+def _main(df: DataFrame, model_output_column_name: str, parquet_file_path: str, use_reduced_models: bool):
     model_output_column = model_output_column_name
 
     print(f"Loaded {len(df)} samples")
