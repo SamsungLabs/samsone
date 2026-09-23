@@ -17,8 +17,8 @@ data class SALMConfig(
     companion object {
         val Samsone99M = SALMConfig(
             name = "Samsone99M",
-            audioModelPath = "/data/local/tmp/Samsone100M_audio_model.pte",
-            textModelPath = "/data/local/tmp/Samsone100M_text_model.pte",
+            audioModelPath = "/data/local/tmp/Samsone99M_audio_model.pte",
+            textModelPath = "/data/local/tmp/Samsone99M_text_model.pte",
             enablePruning = true
         )
 
