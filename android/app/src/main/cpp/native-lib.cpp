@@ -27,7 +27,7 @@ extern "C" {
  * Returns a long (the memory address of the C++ object).
  */
 JNIEXPORT jlong JNICALL
-Java_com_app_samsone_Tokenizer_nativeInit(JNIEnv* env, jobject thiz, jstring json_string) {
+Java_com_samsung_samsone_Tokenizer_nativeInit(JNIEnv* env, jobject thiz, jstring json_string) {
     const char* c_json = env->GetStringUTFChars(json_string, nullptr);
 
     //  uses HuggingFace-style JSON.
@@ -44,7 +44,7 @@ Java_com_app_samsone_Tokenizer_nativeInit(JNIEnv* env, jobject thiz, jstring jso
  * Encodes text into a list of token IDs.
  */
 JNIEXPORT jintArray JNICALL
-Java_com_app_samsone_Tokenizer_nativeEncode(JNIEnv* env, jobject thiz, jlong handle, jstring text) {
+Java_com_samsung_samsone_Tokenizer_nativeEncode(JNIEnv* env, jobject thiz, jlong handle, jstring text) {
     auto* tokenizer = reinterpret_cast<Tokenizer*>(handle);
     const char* c_text = env->GetStringUTFChars(text, nullptr);
 
@@ -59,7 +59,7 @@ Java_com_app_samsone_Tokenizer_nativeEncode(JNIEnv* env, jobject thiz, jlong han
  * Decodes a list of token IDs back into a string.
  */
 JNIEXPORT jstring JNICALL
-Java_com_app_samsone_Tokenizer_nativeDecode(JNIEnv* env, jobject thiz, jlong handle, jintArray ids) {
+Java_com_samsung_samsone_Tokenizer_nativeDecode(JNIEnv* env, jobject thiz, jlong handle, jintArray ids) {
     auto* tokenizer = reinterpret_cast<Tokenizer*>(handle);
     std::vector<int> c_ids = jintArrayToVector(env, ids);
 
@@ -73,7 +73,7 @@ Java_com_app_samsone_Tokenizer_nativeDecode(JNIEnv* env, jobject thiz, jlong han
  * Frees the memory when the Tokenizer is no longer needed.
  */
 JNIEXPORT void JNICALL
-Java_com_app_samsone_Tokenizer_nativeDestroy(JNIEnv* env, jobject thiz, jlong handle) {
+Java_com_samsung_samsone_Tokenizer_nativeDestroy(JNIEnv* env, jobject thiz, jlong handle) {
 delete reinterpret_cast<Tokenizer*>(handle);
 }
 

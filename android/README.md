@@ -77,7 +77,7 @@ Android Studio will handle:
 
 ```
 app/src/main/
-├── java/com/app/samsone/
+├── java/com/samsung/samsone/
 │   ├── presentation/
 │   │   ├── screen/          # Main UI screens
 │   │   ├── components/      # Reusable UI components
