@@ -16,6 +16,7 @@ import com.samsung.samsone.presentation.viewmodel.helpers.AudioProcessingResult
 import com.samsung.samsone.presentation.viewmodel.helpers.AudioCache
 import com.samsung.samsone.presentation.viewmodel.helpers.MemoryTracker
 import com.samsung.samsone.presentation.viewmodel.helpers.ProcessingUtils
+import com.samsung.samsone.presentation.viewmodel.helpers.PromptUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -226,7 +227,7 @@ class BenchmarkViewModel @Inject constructor(
         return withContext(Dispatchers.Default) {
             val startTime = System.currentTimeMillis()
             
-            var textTokens = tokenizer.encode(query + " answer: ")
+            var textTokens = tokenizer.encode(PromptUtils.normalize(query) + " answer: ")
             textTokens = ProcessingUtils.applyReversePruneMap(
                 textTokens,
                 reversePruneMap,
