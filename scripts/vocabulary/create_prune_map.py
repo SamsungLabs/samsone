@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 import re
 
 from transformers import AutoTokenizer
@@ -68,6 +69,8 @@ if __name__ == "__main__":
     pruned_map, reverse_pruned_map, removed, kept = create_prune_map(
         "HuggingFaceTB/SmolLM2-135M"
     )
+
+    Path("outputs").mkdir(exist_ok=True)
 
     with open("outputs/prune_map.json", "w") as f:
         json.dump(pruned_map, f, indent=2)
