@@ -92,10 +92,14 @@ class AudioLMExperiment(L.LightningModule):
     ):
         super().__init__()
         self.audio_lm = audio_lm_model
+        # names the test results directory, updated in on_load_checkpoint/on_train_end
+        self.last_training_epoch = None
 
         if model_ckpt_load_path:
             checkpoint = torch.load(model_ckpt_load_path)
             self.load_state_dict(checkpoint["state_dict"])
+            # the release checkpoints only contain the state_dict
+            self.last_training_epoch = checkpoint.get("epoch")
             logger.info(f"Loaded model from checkpoint {model_ckpt_load_path}")
 
         self.logging_config = logging_config
