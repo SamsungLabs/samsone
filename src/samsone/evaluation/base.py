@@ -33,12 +33,14 @@ class ALMEvaluator(ABC):
 
     def finalize(self, results_dir: str):
         table = pl.from_dict(self.results_summary)
-        Logger.current_logger().report_table(
-            title="Results",
-            series=self.test_dataset_name,
-            iteration=None,
-            table_plot=table.to_pandas(),
-        )
+        clearml_logger = Logger.current_logger()
+        if clearml_logger is not None:
+            clearml_logger.report_table(
+                title="Results",
+                series=self.test_dataset_name,
+                iteration=None,
+                table_plot=table.to_pandas(),
+            )
 
         output_filename = Path(results_dir) / self.results_filename
 

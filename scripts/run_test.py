@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 
 from clearml import Task
+from clearml.backend_api.session.defs import MissingConfigError
 from setproctitle import setproctitle
 from torch import set_float32_matmul_precision
 
@@ -20,7 +21,13 @@ if __name__ == "__main__":
 
     # Access experiment_name from the parsed arguments
     experiment_name = cli.config.get("experiment_name", "default_experiment")
-    Task.init(project_name="samsone", task_name=experiment_name)
+    try:
+        Task.init(project_name="samsone", task_name=experiment_name)
+    except MissingConfigError:
+        logger.warning(
+            "ClearML is not configured, running without it "
+            "(set CLEARML_OFFLINE_MODE=1 to keep an offline ClearML log)."
+        )
 
     output_dir = Path(cli.trainer.logger.save_dir)
     setproctitle(f"{output_dir.parent.name}-test")
